@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>北海学園札幌高校 球技大会</title>
+  <meta name="description" content="北海学園札幌高校の球技大会公式ページ。開催概要、外部ページへのリンク（速報・お知らせ・スケジュール・競技種目・アクセス・問い合わせ）。">
+  <style>
+    :root{
+      /* === カラー（編集パネルからも変更されます） === */
+      --navy: #0C2340;           /* 学校カラー（ネイビー） */
+      --navy-darker:#07152a;
+      --accent-gold:#FFD84D;     /* イベント感のゴールド */
+      --accent-blue:#43C1F2;     /* さわやかブルー */
+      --text: #ffffff;
+      --muted: #cdd7e1;
+      --card: #0f2a50cc;         /* 半透明カード */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    html,body{
+      height:100%;
+      background: radial-gradient(1200px 600px at 15% 10%, #17355f 0%, var(--navy) 45%, var(--navy-darker) 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      line-height:1.6;
+      margin:0;
+      overflow-x:hidden;
+    }
+
+    /* アニメ層（丸いボール） */
+    .balls-layer{
+      position: fixed; inset: 0; z-index: 0; overflow: visible; pointer-events: none;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,1) 35%, rgba(0,0,0,1) 65%, rgba(0,0,0,.2));
+    }
+    .ball{ position:absolute; left:-12vw; will-change: transform, left, top; animation: drift linear infinite; filter: drop-shadow(0 10px 12px rgba(0,0,0,.3)); }
+    .ball-core{
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 35%),
+        radial-gradient(circle at 70% 75%, rgba(0,0,0,.25), rgba(0,0,0,0) 40%);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 -6px 14px rgba(0,0,0,.25);
+      animation: bob ease-in-out infinite alternate; transform: translateZ(0);
+    }
+    .c-tennis    { background-color:#B7F73B; }
+    .c-basket    { background-color:#F2994A; }
+    .c-soccer    { background-color:#F2F2F2; }
+    .c-volley    { background-color:#4FC3F7; }
+    .c-baseball  { background-color:#FFFFFF; }
+    .c-dodge     { background-color:#F25F5C; }
+
+    @keyframes drift{ 0%{ transform: translateX(0) rotate(0deg);} 100%{ transform: translateX(120vw) rotate(720deg);} }
+    @keyframes bob{ 0%{ transform: translateY(calc(var(--bob, 16px) * -1)); } 100%{ transform: translateY(var(--bob, 16px)); } }
+
+    /* ヘッダー */
+    .skip-link{ position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
+    .skip-link:focus{ left: 16px; top: 16px; width:auto; height:auto; z-index:9999; background:#000; color:#fff; padding:.5rem .75rem; border-radius:.5rem; outline: 3px solid var(--accent-blue); }
+    header{
+      position: relative; z-index: 1; padding: 18px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,0));
+      backdrop-filter: blur(4px);
+    }
+    .brand{ display:flex; align-items:center; gap:.75rem; font-weight:700; letter-spacing:.02em; }
+    .brand__mark{ width:36px; height:36px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff, #fff0 45%), var(--accent-blue); border:2px solid rgba(255,255,255,.65); box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.2); }
+    nav a{ color: var(--text); text-decoration:none; margin-left:18px; padding: 8px 12px; border-radius:999px; transition: transform .15s ease, background-color .2s ease, color .2s ease; }
+    nav a:hover{ background: rgba(255,255,255,.12); transform: translateY(-1px); }
+
+    /* ヒーロー */
+    .hero{ position:relative; z-index:1; padding: clamp(48px, 8vw, 100px) 20px 48px; text-align:center; }
+    .eyebrow{ display:inline-block; font-size:.95rem; letter-spacing:.15em; color: #111; background: linear-gradient(90deg, var(--accent-gold), #FFB703); padding: .35rem .75rem; border-radius: 999px; box-shadow: var(--shadow); }
+    .headline{ font-size: clamp(28px, 4.8vw, 48px); margin: 18px auto 10px; font-weight: 800; line-height: 1.2; text-wrap: balance; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
+    .sub{ max-width: 780px; margin: 0 auto 28px; color: var(--muted); font-size: clamp(15px, 2.2vw, 18px); }
+    .cta{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn{ display:inline-flex; align-items:center; gap:.5rem; padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,.18); text-decoration:none; color:#0b172b; font-weight:700; background: linear-gradient(180deg, #fff, #dfe9ff); box-shadow: var(--shadow); transition: transform .15s ease, box-shadow .2s ease, filter .2s ease; }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.02); }
+    .btn--outline{ background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,.35); box-shadow: none; }
+    .btn--outline:hover{ background: rgba(255,255,255,.12); }
+
+    /* セクション共通 */
+    main{ position: relative; z-index: 1; padding: 0 20px 80px; }
+    .info-card{
+      max-width: 980px; margin: 24px auto;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.12); border-radius: 16px; box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .info-card__inner{ padding: 22px; }
+    .info-card h2{ font-size: 1.25rem; font-weight:800; letter-spacing:.02em; margin: 4px 0 10px; }
+    .spark{ color: #0b172b; background: linear-gradient(90deg, var(--accent-gold), #FFB703); padding: .2rem .55rem; border-radius: .5rem; box-shadow: 0 6px 12px rgba(0,0,0,.25); }
+    .muted{ color: var(--muted); }
+
+    /* フッター */
+    footer{ position: relative; z-index:1; padding: 40px 20px 60px; text-align:center; color: var(--muted); }
+    footer a{ color: var(--accent-blue); }
+
+    /* 編集UI */
+    .edit-toggle{ position: fixed; right: 16px; top: 16px; z-index: 1000; }
+    .edit-panel{
+      position: fixed; right: 16px; top: 64px; width: 320px; max-width: 92vw;
+      background: rgba(18,26,44,.9); border:1px solid rgba(255,255,255,.2);
+      border-radius: 14px; padding: 12px; z-index: 1000; color: #fff; display:none; box-shadow: var(--shadow); backdrop-filter: blur(6px);
+    }
+    .edit-panel h3{ margin: 6px 0 10px; font-size: 1.05rem; }
+    .edit-panel label{ font-size: .9rem; opacity: .9; }
+    .edit-row{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px; }
+    .edit-panel input[type="text"], .edit-panel input[type="color"]{ width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); color:#fff; }
+    .edit-panel button{ padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.15); color:#fff; cursor:pointer; }
+    .edit-panel button:hover{ background: rgba(255,255,255,.25); }
+
+    .edit-mode [data-editable="true"]{ outline: 2px dashed rgba(255,255,255,.35); outline-offset: 2px; border-radius: 6px; }
+
+    /* アニメ低減 */
+    @media (prefers-reduced-motion: reduce){ .ball, .ball-core{ animation: none !important; } }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">本文へスキップ</a>
+
+  <!-- アニメーションボール -->
+  <div class="balls-layer" aria-hidden="true"></div>
+
+  <!-- 編集トグル -->
+  <div class="edit-toggle">
+    <button id="toggleEdit" class="btn btn--outline">✏️ 編集モード</button>
+  </div>
+
+  <!-- 編集パネル -->
+  <div id="editPanel" class="edit-panel" role="region" aria-label="編集パネル">
+    <h3>編集パネル</h3>
+    <div class="edit-hint">テキストはページ上で直接編集できます。色とリンクは下で調整 → 保存。</div>
+
+    <!-- 色設定 -->
+    <h3>カラー</h3>
+    <div class="edit-row">
+      <label>学校カラー</label>
+      <input type="color" id="colorNavy" value="#0C2340" title="--navy">
+    </div>
+    <div class="edit-row">
+      <label>アクセント（ゴールド）</label>
+      <input type="color" id="colorGold" value="#FFD84D" title="--accent-gold">
+    </div>
+    <div class="edit-row">
+      <label>アクセント（ブルー）</label>
+      <input type="color" id="colorBlue" value="#43C1F2" title="--accent-blue">
+    </div>
+
+    <!-- 外部リンク設定 -->
+    <h3>リンクURL</h3>
+    <div class="edit-hint">メニューの遷移先URLを入力してください（空欄=無効リンク）。</div>
+    <div class="edit-row">
+      <label for="urlFlash">速報</label>
+      <input type="text" id="urlFlash"
+value="https://docs.google.com/spreadsheets/d/e/2PACX-1vS-RIWZPYNa2ycIJmfuXljLwk8llB6Ty3gErQuhZYYt74fhazev94MRma891me1Qg/pubhtml">
+    </div>
+    <div class="edit-row">
+      <label for="urlNews">お知らせ</label>
+      <input type="text" id="urlNews"
+value="https://docs.google.com/document/d/e/2PACX-1vTew8pziDIiqB9b9E3gquQnpsIwyGg0ndx9J6EjY5EhVNJ4GOIejcwP9NVzn2stSsC2METhJOkNElOk/pub">
+    </div>
+    <div class="edit-row">
+      <label for="urlSchedule">スケジュール</label>
+      <input type="text" id="urlSchedule"
+value="https://docs.google.com/document/d/e/2PACX-1vTew8pziDIiqB9b9E3gquQnpsIwyGg0ndx9J6EjY5EhVNJ4GOIejcwP9NVzn2stSsC2METhJOkNElOk/pub">
+    </div>
+    <div class="edit-row">
+      <label for="urlSports">競技種目</label>
+      <input type="text" id="urlSports"
+value="https://docs.google.com/document/d/e/2PACX-1vTew8pziDIiqB9b9E3gquQnpsIwyGg0ndx9J6EjY5EhVNJ4GOIejcwP9NVzn2stSsC2METhJOkNElOk/pub">
+    </div>
+    <div class="edit-row">
+      <label for="urlAccess">アクセス</label>
+      <input type="text" id="urlAccess" placeholder="https://example.com/access">
+    </div>
+    <div class="edit-row">
+      <label for="urlContact">問い合わせ</label>
+      <input type="text" id="urlContact" placeholder="https://example.com/contact">
+    </div>
+
+    <!-- 保存系 -->
+    <div class="edit-actions" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button id="btnSave">💾 保存</button>
+      <button id="btnLoad">⟳ 読み込み</button>
+      <button id="btnExport">⬇️ エクスポート</button>
+      <button id="btnImport">⬆️ インポート</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none">
+    </div>
+    <div class="muted" style="margin-top:6px;">※ 保存はこのブラウザに記録されます。公開PCではエクスポートJSONをご利用ください。</div>
+  </div>
+
+  <header>
+    <div class="brand" aria-label="サイトタイトル">
+      <div class="brand__mark" aria-hidden="true"></div>
+      <div>
+        <div style="opacity:.9;font-size:.9rem;" data-editable="true" contenteditable="false" id="schoolName">北海学園札幌高校</div>
+        <div style="font-size:1.05rem;" data-editable="true" contenteditable="false" id="eventName">球技大会</div>
+      </div>
+    </div>
+    <nav aria-label="主要ナビゲーション">
+      <a id="lnkFlash"    href="javascript:void(0)" title="速報">速報</a>
+      <a id="lnkNews"     href="javascript:void(0)" title="お知らせ">お知らせ</a>
+      <a id="lnkSchedule" href="javascript:void(0)" title="スケジュール">スケジュール</a>
+      <a id="lnkSports"   href="javascript:void(0)" title="競技種目">競技種目</a>
+      <a id="lnkAccess"   href="javascript:void(0)" title="アクセス">アクセス</a>
+      <a id="lnkContact"  href="javascript:void(0)" title="問い合わせ">問い合わせ</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow" data-editable="true" contenteditable="false" id="tagline">SCHOOL SPORTS FESTIVAL</span>
+    <h1 class="headline"><span id="heroTitle" data-editable="true" contenteditable="false">北海学園札幌高校 <span style="color:var(--accent-gold)">球技大会</span></span></h1>
+    <p class="sub" id="heroSub" data-editable="true" contenteditable="false">
+      仲間と全力で、笑顔で、そしてフェアに。<br>
+      今年も熱い戦いがはじまります！
+    </p>
+    <div class="cta">
+      <!-- CTAは設定済みURLがあれば外部を開く／なければ無効 -->
+      <a id="ctaSchedule" class="btn" href="javascript:void(0)" title="スケジュール">⏰ スケジュールを見る</a>
+      <a id="ctaNews" class="btn btn--outline" href="javascript:void(0)" title="お知らせ">📣 最新のお知らせ</a>
+    </div>
+  </section>
+
+  <main id="main">
+    <!-- セクションは削除。必要に応じて独自の案内カードを置くことができます。 -->
+    <div class="info-card" aria-live="polite">
+      <div class="info-card__inner">
+        <h2><span class="spark">ご案内</span></h2>
+        <p data-editable="true" contenteditable="false" id="introText">
+          本ページでは開催概要と外部ページへのリンクを提供します。<br>
+          詳細（速報／お知らせ／スケジュール／競技種目／アクセス／問い合わせ）は上部ナビから各ページをご覧ください。
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> <span data-editable="true" contenteditable="false" id="schoolFooter">北海学園札幌高校</span> 球技大会
+  </footer>
+
+  <script>
+    // ===== 年表示 =====
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== ボールのアニメ生成 =====
+    const BALL_COUNT = 14, SIZE_MIN = 24, SIZE_MAX = 96, SPEED_MIN = 16, SPEED_MAX = 42, BOB_MIN = 8, BOB_MAX = 26;
+    const palette = ["c-tennis","c-basket","c-soccer","c-volley","c-baseball","c-dodge"];
+    const layer = document.querySelector('.balls-layer');
+
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function spawnBall(){
+      const wrap = document.createElement('div'); wrap.className = 'ball';
+      const core = document.createElement('div'); core.className = 'ball-core ' + pick(palette);
+      const size = Math.round(rand(SIZE_MIN, SIZE_MAX));
+      core.style.width = size + 'px'; core.style.height = size + 'px';
+      wrap.style.top = rand(5, 85) + 'vh';
+      const duration = rand(SPEED_MIN, SPEED_MAX);
+      wrap.style.animationDuration = duration + 's';
+      wrap.style.animationDelay = (-1 * rand(0, duration)) + 's';
+      const bob = Math.round(rand(BOB_MIN, BOB_MAX));
+      core.style.setProperty('--bob', bob + 'px');
+      core.style.animationDuration = rand(2.4, 4.4) + 's';
+      core.style.animationDelay = rand(0, 2) + 's';
+      const depth = rand(0.6, 1.0); core.style.opacity = depth.toFixed(2);
+      wrap.appendChild(core); layer.appendChild(wrap);
+    }
+    for(let i=0; i<BALL_COUNT; i++) spawnBall();
+    setInterval(()=>{
+      if(document.hidden) return;
+      const children = layer.children; if(!children.length) return;
+      const idx = Math.floor(Math.random()*children.length);
+      const wrap = children[idx];
+      wrap.style.top = rand(5, 85) + 'vh';
+      wrap.style.animationDuration = rand(SPEED_MIN, SPEED_MAX) + 's';
+    }, 5000);
+
+    // ====== 編集モード制御 ======
+    const root = document.documentElement;
+    const toggleBtn = document.getElementById('toggleEdit');
+    const panel = document.getElementById('editPanel');
+    const colorNavy = document.getElementById('colorNavy');
+    const colorGold = document.getElementById('colorGold');
+    const colorBlue = document.getElementById('colorBlue');
+    const btnSave = document.getElementById('btnSave');
+    const btnLoad = document.getElementById('btnLoad');
+    const btnExport = document.getElementById('btnExport');
+    const btnImport = document.getElementById('btnImport');
+    const importFile = document.getElementById('importFile');
+
+    function setEditable(enabled){
+      document.body.classList.toggle('edit-mode', enabled);
+      document.querySelectorAll('[data-editable="true"]').forEach(el=>{
+        el.contentEditable = enabled ? 'true' : 'false';
+      });
+      panel.style.display = enabled ? 'block' : 'none';
+      toggleBtn.textContent = enabled ? '✅ 編集完了（保存推奨）' : '✏️ 編集モード';
+    }
+    toggleBtn.addEventListener('click', ()=> setEditable(!document.body.classList.contains('edit-mode')));
+
+    // 色変更
+    function applyColors(){
+      root.style.setProperty('--navy', colorNavy.value);
+      root.style.setProperty('--accent-gold', colorGold.value);
+      root.style.setProperty('--accent-blue', colorBlue.value);
+    }
+    [colorNavy,colorGold,colorBlue].forEach(inp=> inp.addEventListener('input', applyColors));
+
+    // ====== 外部リンク（ナビ + CTA） ======
+    const navLinks = {
+      flash:    document.getElementById('lnkFlash'),
+      news:     document.getElementById('lnkNews'),
+      schedule: document.getElementById('lnkSchedule'),
+      sports:   document.getElementById('lnkSports'),
+      access:   document.getElementById('lnkAccess'),
+      contact:  document.getElementById('lnkContact'),
+    };
+    const ctaLinks = {
+      news: document.getElementById('ctaNews'),
+      schedule: document.getElementById('ctaSchedule'),
+    };
+    const urlInputs = {
+      flash:    document.getElementById('urlFlash'),
+      news:     document.getElementById('urlNews'),
+      schedule: document.getElementById('urlSchedule'),
+      sports:   document.getElementById('urlSports'),
+      access:   document.getElementById('urlAccess'),
+      contact:  document.getElementById('urlContact'),
+    };
+
+    function sanitizeUrl(url){
+      const u = (url || '').trim();
+      if(!u) return '';
+      try{
+        // 相対URLも許可（ベースは現在のオリジン）
+        const parsed = new URL(u, window.location.origin);
+        if(!/^https?:$/.test(parsed.protocol)) return '';
+        return parsed.toString();
+      }catch(_){
+        return '';
+      }
+    }
+
+    function setAnchor(a, href){
+      if(!a) return;
+      const u = sanitizeUrl(href);
+      if(u){
+        a.href = u;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.dataset.active = '1';
+        if(!/（別タブで開きます）$/.test(a.title || '')){
+          a.title = (a.title || a.textContent || '') + '（別タブで開きます）';
+        }
+      }else{
+        a.href = 'javascript:void(0)';
+        a.removeAttribute('target');
+        a.removeAttribute('rel');
+        a.dataset.active = '0';
+        a.title = (a.title || a.textContent || '').replace(/（別タブで開きます）/g, '');
+      }
+    }
+
+    function applyNavUrls(urls){
+      setAnchor(navLinks.flash,    urls?.flash);
+      setAnchor(navLinks.news,     urls?.news);
+      setAnchor(navLinks.schedule, urls?.schedule);
+      setAnchor(navLinks.sports,   urls?.sports);
+      setAnchor(navLinks.access,   urls?.access);
+      setAnchor(navLinks.contact,  urls?.contact);
+
+      // CTAは navUrls を参照（必要に応じて）
+      setAnchor(ctaLinks.news,     urls?.news);
+      setAnchor(ctaLinks.schedule, urls?.schedule);
+
+      // 編集パネルの入力欄にも反映
+      if(urlInputs){
+        Object.entries(urlInputs).forEach(([key, inp])=>{
+          if(inp) inp.value = (urls?.[key] || '');
+        });
+      }
+    }
+
+    // URL 入力の変更で即時適用（保存は明示的に💾）
+    Object.entries(urlInputs).forEach(([key, inp])=>{
+      inp?.addEventListener('input', ()=>{
+        const current = readState();
+        current.navUrls = current.navUrls || {};
+        current.navUrls[key] = inp.value;
+        applyNavUrls(current.navUrls);
+      });
+    });
+
+    // ====== 保存/読み込み（localStorage + JSONエクスポート） ======
+    const STORAGE_KEY = 'hgu-sportsfest-v2-minimal-with-flash';
+
+    function readState(){
+      // テキスト類（ID付き & data-editable）
+      const textFields = {};
+      document.querySelectorAll('[id][data-editable="true"]').forEach(el=>{
+        textFields[el.id] = el.innerHTML;
+      });
+
+      // 色
+      const styles = getComputedStyle(root);
+      const colors = {
+        navy: styles.getPropertyValue('--navy').trim(),
+        gold: styles.getPropertyValue('--accent-gold').trim(),
+        blue: styles.getPropertyValue('--accent-blue').trim(),
+      };
+
+      // ナビURL（入力欄から）
+      const navUrls = {
+        flash:    urlInputs.flash?.value || '',
+        news:     urlInputs.news?.value || '',
+        schedule: urlInputs.schedule?.value || '',
+        sports:   urlInputs.sports?.value || '',
+        access:   urlInputs.access?.value || '',
+        contact:  urlInputs.contact?.value || '',
+      };
+
+      return { textFields, colors, navUrls, savedAt: new Date().toISOString() };
+    }
+
+    function applyState(state){
+      // テキスト
+      if(state.textFields){
+        Object.entries(state.textFields).forEach(([id, html])=>{
+          const el = document.getElementById(id);
+          if(el) el.innerHTML = html;
+        });
+      }
+      // 色
+      if(state.colors){
+        // 入力欄の値に変換（#RRGGBB のみ反映）
+        function toColorInput(val, fallback){
+          const hex = (val || '').trim();
+          return /^#([0-9A-Fa-f]{6})$/.test(hex) ? hex : fallback;
+        }
+        colorNavy.value = toColorInput(state.colors.navy, '#0C2340');
+        colorGold.value = toColorInput(state.colors.gold, '#FFD84D');
+        colorBlue.value = toColorInput(state.colors.blue, '#43C1F2');
+        applyColors();
+      }
+      // URL
+      if(state.navUrls){
+        applyNavUrls(state.navUrls);
+      }else{
+        applyNavUrls({});
+      }
+    }
+
+    function save(){
+      const state = readState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      alert('保存しました（このブラウザに保存）。');
+    }
+    function load(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){ alert('保存データがありません'); return; }
+      try{
+        const state = JSON.parse(raw);
+        applyState(state);
+        alert('保存データを読み込みました。');
+      }catch(e){ alert('読み込みに失敗しました。'); }
+    }
+    function exportJSON(){
+      const state = readState();
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'sports-festival-minimal-with-flash.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+    function importJSON(file){
+      const reader = new FileReader();
+      reader.onload = e=>{
+        try{
+          const state = JSON.parse(e.target.result);
+          applyState(state);
+          alert('インポートして反映しました。必要なら保存してください。');
+        }catch(err){ alert('JSONの読み込みに失敗しました。'); }
+      };
+      reader.readAsText(file);
+    }
+
+    btnSave.addEventListener('click', save);
+    btnLoad.addEventListener('click', load);
+    btnExport.addEventListener('click', exportJSON);
+    btnImport.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', (e)=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
+
+    // 初回ロード時に既存設定があれば適用
+    (function init(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        try{ applyState(JSON.parse(raw)); }catch(e){}
+      }else{
+        // 初回は空のURLを適用（＝無効リンク）
+        applyNavUrls({});
+      }
+      applyColors(); // デフォルト色反映
+    })();
+  </script>
+</body>
+</html>
